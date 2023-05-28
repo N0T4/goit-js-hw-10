@@ -76,7 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           catName.textContent = `Порода: ${breed.name}`;
 
-          catDescription.innerHTML = `Опис: <a href="${breed.wikipedia_url}" target="_blank">${breed.wikipedia_url}</a>`;
+          // Опис породи кота
+          catDescription.textContent = `Опис: ${breed.description}`;
 
           catTemperament.textContent = `Темперамент: ${breed.temperament}`;
 
