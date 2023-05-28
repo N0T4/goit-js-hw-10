@@ -1,21 +1,41 @@
-// Функція для отримання списку порід котів
+// cat-api.js
+
+
 export function fetchBreeds(apiKey) {
-  return fetch('https://api.thecatapi.com/v1/breeds', {
+  const url = 'https://api.thecatapi.com/v1/breeds';
+
+  return fetch(url, {
     headers: {
-      'Authorization': `Bearer ${apiKey}`
-    }
+      'x-api-key': apiKey,
+    },
   })
-    .then(response => response.json())
-    .then(data => data);
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Не вдалося отримати список порід котів');
+      }
+      return response.json();
+    })
+    .catch(error => {
+      throw new Error('Не вдалося отримати список порід котів');
+    });
 }
 
-// Функція для отримання даних про кота певної породи
 export function fetchCatByBreed(breedId, apiKey) {
-  return fetch(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`, {
+  const url = `https://api.thecatapi.com/v1/images/search?breed_id=${breedId}`;
+
+  return fetch(url, {
     headers: {
-      'Authorization': `Bearer ${apiKey}`
-    }
+      'x-api-key': apiKey,
+    },
   })
-    .then(response => response.json())
-    .then(data => data[0]);
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Не вдалося отримати дані про кота');
+      }
+      return response.json();
+    })
+    .then(data => data[0])
+    .catch(error => {
+      throw new Error('Не вдалося отримати дані про кота');
+    });
 }

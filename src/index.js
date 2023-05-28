@@ -1,5 +1,6 @@
-import SlimSelect from 'slim-select'
-import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SlimSelect from 'slim-select';
+import Notiflix from 'notiflix';
+
 import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
 
 const apiKey = 'live_FuyG1boZ844BfvsEF15hu0eaWFgH6lVETd9Mu1tTqiwgNIrIwj7b9jSqIVcmXyjS';
@@ -10,6 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const loader = document.querySelector('.loader');
   const errorText = document.querySelector('.error');
   const catInfo = document.querySelector('.cat-info');
+
+  breedSelect.style.display = 'none';
+  loadingText.style.display = 'block';
+  loader.style.display = 'block';
+  catInfo.style.display = 'none';
+
+  errorText.style.display = 'none';
+
+  const catImage = document.createElement('img');
+  const catName = document.createElement('p');
+  const catDescription = document.createElement('p');
+  const catTemperament = document.createElement('p');
 
   // Отримати та заповнити список порід
   fetchBreeds(apiKey)
@@ -25,9 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
       new SlimSelect({
         select: '.breed-select',
       });
+
+      breedSelect.style.display = 'block';
+      loadingText.style.display = 'none';
+      loader.style.display = 'none';
     })
     .catch(error => {
-      errorText.style.display = 'block';
+      Notiflix.Notify.failure('Не вдалося отримати список порід котів');
       console.error(error);
     });
 
@@ -50,19 +67,30 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingText.style.display = 'none';
         loader.style.display = 'none';
 
-        // Вивести отримані дані про кота
-        const catImage = document.createElement('img');
-        catImage.src = catData.url;
-        catImage.alt = 'Котик';
-        catInfo.appendChild(catImage);
+        // Перевірити, чи є дані про породу кота
+        if (catData.breeds && catData.breeds.length > 0) {
+          const breed = catData.breeds[0];
 
-        const catName = document.createElement('p');
-        catName.textContent = `Ім'я: ${catData.name}`;
-        catInfo.appendChild(catName);
+          // Оновити дані про кота
+          catImage.src = catData.url;
+          catImage.alt = 'Котик';
 
-        const catDescription = document.createElement('p');
-        catDescription.textContent = `Опис: ${catData.description}`;
-        catInfo.appendChild(catDescription);
+          catName.textContent = `Порода: ${breed.name}`;
+
+          catDescription.textContent = `Опис: ${breed.wikipedia_url}`;
+
+          catTemperament.textContent = `Темперамент: ${breed.temperament}`;
+
+          // Додати оновлені елементи до контейнера
+          catInfo.appendChild(catImage);
+          catInfo.appendChild(catName);
+          catInfo.appendChild(catDescription);
+          catInfo.appendChild(catTemperament);
+
+          catInfo.style.display = 'block';
+        } else {
+          Notiflix.Notify.failure('Не вдалося отримати дані про кота');
+        }
       })
       .catch(error => {
         // Сховати завантажувач у разі помилки
@@ -70,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loader.style.display = 'none';
 
         // Показати повідомлення про помилку
-        errorText.style.display = 'block';
+        Notiflix.Notify.failure('Не вдалося отримати дані про кота');
         console.error(error);
       });
   });
