@@ -1,9 +1,10 @@
 import SlimSelect from 'slim-select';
 import Notiflix from 'notiflix';
+import axios from 'axios';
 
-import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
-
-const apiKey = 'live_FuyG1boZ844BfvsEF15hu0eaWFgH6lVETd9Mu1tTqiwgNIrIwj7b9jSqIVcmXyjS';
+const API_KEY = 'live_FuyG1boZ844BfvsEF15hu0eaWFgH6lVETd9Mu1tTqiwgNIrIwj7b9jSqIVcmXyjS';
+const breedsUrl = `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`;
+const catImageUrl = `https://api.thecatapi.com/v1/images/search?breed_ids=%{breedId}&api_key=${API_KEY}`;
 
 document.addEventListener('DOMContentLoaded', () => {
   const breedSelect = document.querySelector('.breed-select');
@@ -13,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const catInfo = document.querySelector('.cat-info');
 
   breedSelect.style.display = 'none';
-  loadingText.style.display = 'block';
-  loader.style.display = 'block';
+  loadingText.style.display = 'none';
+  loader.style.display = 'none';
   catInfo.style.display = 'none';
 
   errorText.style.display = 'none';
@@ -25,8 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const catTemperament = document.createElement('p');
 
   // Отримати та заповнити список порід
-  fetchBreeds(apiKey)
-    .then(breeds => {
+  axios.get(breedsUrl)
+    .then(response => {
+      const breeds = response.data;
       breeds.forEach(breed => {
         const option = document.createElement('option');
         option.value = breed.id;
@@ -34,14 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
         breedSelect.appendChild(option);
       });
 
-      // Ініціалізувати бібліотеку красивого вибору
-      new SlimSelect({
-        select: '.breed-select',
-      });
-
       breedSelect.style.display = 'block';
-      loadingText.style.display = 'none';
-      loader.style.display = 'none';
+
+      // Ініціалізувати бібліотеку вибору після заповнення елементів
+      new SlimSelect({
+        select: '.breed-select'
+      });
     })
     .catch(error => {
       Notiflix.Notify.failure('Не вдалося отримати список порід котів');
@@ -59,13 +59,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingText.style.display = 'block';
     loader.style.display = 'block';
     errorText.style.display = 'none';
+    catInfo.style.display = 'none';
 
     // Отримати дані про кота за вибраною породою
-    fetchCatByBreed(selectedBreedId, apiKey)
-      .then(catData => {
-        // Сховати завантажувач після отримання даних про кота
-        loadingText.style.display = 'none';
-        loader.style.display = 'none';
+    axios.get(catImageUrl.replace('%{breedId}', selectedBreedId))
+      .then(response => {
+        const catData = response.data[0];
 
         // Перевірити, чи є дані про породу кота
         if (catData.breeds && catData.breeds.length > 0) {
@@ -77,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           catName.textContent = `Порода: ${breed.name}`;
 
-          catDescription.textContent = `Опис: ${breed.wikipedia_url}`;
+          catDescription.innerHTML = `Опис: <a href="${breed.wikipedia_url}" target="_blank">${breed.wikipedia_url}</a>`;
 
           catTemperament.textContent = `Темперамент: ${breed.temperament}`;
 
@@ -91,6 +90,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           Notiflix.Notify.failure('Не вдалося отримати дані про кота');
         }
+
+        // Сховати завантажувач після отримання даних про кота
+        loadingText.style.display = 'none';
+        loader.style.display = 'none';
       })
       .catch(error => {
         // Сховати завантажувач у разі помилки

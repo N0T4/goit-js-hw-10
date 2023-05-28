@@ -1,25 +1,39 @@
+/* Стилі для елемента вибору порід котів */
+.breed-select {
+    width: 300px;
+    padding: 10px;
+    border: 1px solid tomato;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #fff;
+    color: black;
+    margin: 0 auto;
+    overflow: auto;
+}
+
+/* Стилі для тексту завантаження */
+.loading {
+    display: none;
+    font-size: 18px;
+    margin-top: 10px;
+    color: black;
+    text-align: center;
+    position: relative;
+}
+
+/* Стилі для лоадера */
 .loader {
     width: 48px;
     height: 48px;
     border-width: 3px;
     border-style: dashed solid solid dotted;
-    border-color: #FF3D00 #FF3D00 transparent #FF3D00;
+    border-color: tomato tomato transparent tomato;
     border-radius: 50%;
-    display: inline-block;
-    position: relative;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
-}
-
-.loader::after {
-    content: '';
-    box-sizing: border-box;
     position: absolute;
-    left: 20px;
-    top: 31px;
-    border: 10px solid transparent;
-    border-right-color: #FF3D00;
-    transform: rotate(-40deg);
+    
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotation 1s linear infinite;
 }
 
 @keyframes rotation {
@@ -30,4 +44,43 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+
+/* Стилі для контейнера з інформацією про кота */
+.cat-info {
+    display: none;
+    margin-top: 20px;
+    background-color: #f8f8ff;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+    border: 2px solid tomato;
+}
+
+/* Стилі для зображення кота */
+.cat-info img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+/* Стилі для назви породи кота */
+.cat-info p {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: tomato;
+}
+
+/* Стилі для посилання на опис породи */
+.cat-info p a {
+    color: tomato;
+    text-decoration: none;
+}
+
+.cat-info p a:hover {
+    text-decoration: underline;
 }
